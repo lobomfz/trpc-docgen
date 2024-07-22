@@ -14,3 +14,5 @@ heavily based on [package-trpc-swagger](https://github.com/Vercjames/package-trp
 ```
   subRouter.getDate -> /sub-router/get-date
 ```
+
+- possibly use ts-morph to extract types to remove schema dependency
