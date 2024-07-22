@@ -8,7 +8,7 @@ const replacer = (_match: string, p1: string, p2: string) => {
 };
 
 export function normalizePath(path: string) {
-	return path.replace(/([A-Z])|(\.)(?=[^/])/g, replacer);
+	return `/${path.replace(/([A-Z])|(\.)(?=[^/])/g, replacer)}`;
 }
 
 export function acceptsBody(method: string) {
