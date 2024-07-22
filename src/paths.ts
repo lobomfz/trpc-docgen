@@ -44,7 +44,7 @@ export async function buildPaths(
 
 		const inputData = await parseInputSchema({
 			schema: schemas.input,
-			example: openapi?.example?.request,
+			example: openapi?.reqEx,
 			contentTypes,
 			headerParameters,
 			method: httpMethod,
@@ -52,7 +52,7 @@ export async function buildPaths(
 
 		const responses = await parseOutputSchema({
 			schema: schemas.output,
-			example: openapi?.example?.response,
+			example: openapi?.resEx,
 			headers: openapi?.responseHeaders,
 		});
 

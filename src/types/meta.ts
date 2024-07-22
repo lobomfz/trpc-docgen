@@ -21,10 +21,8 @@ export type OpenApiMeta<TMeta = Record<string, unknown>> = TMeta & {
 		})[];
 		contentTypes?: OpenApiContentType[];
 		deprecated?: boolean;
-		example?: {
-			request?: Record<string, any>;
-			response?: Record<string, any>;
-		};
+		reqEx?: Record<string, any>;
+		resEx?: Record<string, any>;
 		responseHeaders?: Record<
 			string,
 			OpenAPIV3_1.HeaderObject | OpenAPIV3_1.ReferenceObject
