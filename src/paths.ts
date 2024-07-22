@@ -1,13 +1,14 @@
 import type { AnyTRPCProcedure, AnyTRPCRouter } from "@trpc/server";
 import type { OpenAPIV3_1 } from "openapi-types";
-import type { OpenApiMeta } from "./types/meta";
-import { extractProcedureSchemas, normalizePath } from "./utils";
-import { parseInputSchema } from "./parse";
+import type { GenerateOpenApiDocumentOptions, OpenApiMeta } from "./types/meta";
+import { extractProcedureSchemas } from "./utils";
+import { parseInputSchema, parseOutputSchema } from "./parse";
+import { getProcedureDetails } from "./procedure";
 
 export async function buildPaths(
 	appRouter: AnyTRPCRouter,
 	securitySchemeNames: string[],
-	blacklistedOnly: boolean,
+	opts: GenerateOpenApiDocumentOptions,
 ) {
 	const pathsObject: OpenAPIV3_1.PathsObject = {};
 
@@ -20,7 +21,8 @@ export async function buildPaths(
 		const openapi = (procedure._def?.meta as any)
 			?.openapi as OpenApiMeta["openapi"];
 
-		if ((!openapi && !blacklistedOnly) || openapi?.enabled === false) continue;
+		if ((!openapi && !opts.blacklistedOnly) || openapi?.enabled === false)
+			continue;
 
 		const type = procedure._def.type;
 
@@ -29,7 +31,7 @@ export async function buildPaths(
 		}
 
 		const { procedureName, path, headerParameters, httpMethod, contentTypes } =
-			getProcedureDetails(_path, procedure, openapi);
+			getProcedureDetails(_path, procedure, openapi, opts.wordsToRemove);
 
 		if (pathsObject[path]?.[httpMethod]) {
 			throw new Error(`Duplicate path: ${path}`);
@@ -45,6 +47,12 @@ export async function buildPaths(
 			method: httpMethod,
 		});
 
+		const responses = await parseOutputSchema({
+			schema: schemas.output,
+			example: openapi?.example?.response,
+			headers: openapi?.responseHeaders,
+		});
+
 		pathsObject[path] = {
 			...pathsObject[path],
 			[httpMethod]: {
@@ -56,54 +64,12 @@ export async function buildPaths(
 					? securitySchemeNames.map((name) => ({ [name]: [] }))
 					: undefined,
 				...inputData,
-				// responses: await getResponsesObject(
-				//     outputParser,
-				//     openapi.example?.response,
-				//     openapi.responseHeaders,
-				// ),
+				responses,
+
 				...(openapi?.deprecated ? { deprecated: openapi.deprecated } : {}),
 			},
 		};
 	}
 
 	return pathsObject;
-}
-
-const typeMethodMap = {
-	query: "get",
-	mutation: "post",
-	subscription: null,
-} as const;
-
-function getProcedureDetails(
-	path: string,
-	procedure: AnyTRPCProcedure,
-	openapi: OpenApiMeta["openapi"],
-) {
-	const httpMethod = typeMethodMap[procedure._def.type];
-
-	if (!httpMethod)
-		throw new Error(`Unsupported procedure method: ${procedure._def.type}`);
-
-	const contentTypes = openapi?.contentTypes || ["application/json"];
-
-	const procedureName = `${procedure._def.type}.${path}`;
-
-	if (contentTypes.length === 0) {
-		throw new Error(`No content types specified for ${procedureName}`);
-	}
-
-	const normalizedPath = normalizePath(openapi?.path ?? path);
-
-	const headerParameters =
-		openapi?.headers?.map((header) => ({ ...header, in: "header" as const })) ||
-		[];
-
-	return {
-		procedureName,
-		path: normalizedPath,
-		headerParameters,
-		httpMethod,
-		contentTypes,
-	};
 }

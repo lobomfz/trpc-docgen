@@ -41,4 +41,5 @@ export type GenerateOpenApiDocumentOptions = {
 	tags?: string[];
 	securitySchemes?: OpenAPIV3_1.ComponentsObject["securitySchemes"];
 	blacklistedOnly?: boolean;
+	wordsToRemove?: string[];
 };

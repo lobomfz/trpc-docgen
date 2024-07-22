@@ -43,11 +43,32 @@ export async function parseInputSchema(data: {
 	};
 }
 
-// export async function parseOutputSchema(data: {}) {
-// 	return {
-// 		200: successResponseObject,
-// 		default: {
-// 			$ref: "#/components/responses/error",
-// 		},
-// 	};
-// }
+export async function parseOutputSchema(data: {
+	schema: Schema;
+	example: Record<string, any> | undefined;
+	headers:
+		| Record<string, OpenAPIV3_1.HeaderObject | OpenAPIV3_1.ReferenceObject>
+		| undefined;
+}) {
+	const { example, headers } = data;
+
+	const schema = await toJSONSchema(data.schema);
+
+	const successResponseObject: OpenAPIV3_1.ResponseObject = {
+		description: "Successful response",
+		headers,
+		content: {
+			"application/json": {
+				schema: schema as any,
+				example,
+			},
+		},
+	};
+
+	return {
+		200: successResponseObject,
+		default: {
+			$ref: "#/components/responses/error",
+		},
+	};
+}

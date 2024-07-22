@@ -7,8 +7,30 @@ const replacer = (_match: string, p1: string, p2: string) => {
 	return "";
 };
 
-export function normalizePath(path: string) {
-	return `/${path.replace(/([A-Z])|(\.)(?=[^/])/g, replacer)}`;
+export function normalizePath(
+	path: string,
+	wordsToRemove: string[] = ["get", "create", "info"],
+) {
+	const routeSegments = path
+		.replace(/([A-Z])|(\.)(?=[^/])/g, replacer)
+		.toLowerCase()
+		.split("/");
+
+	const processedSegments = routeSegments.map((segment) => {
+		const parts = segment.split("-");
+
+		const processedParts: string[] = [];
+
+		for (const part of parts) {
+			if (!wordsToRemove.includes(part)) {
+				processedParts.push(part);
+			}
+		}
+
+		return processedParts.join("-");
+	});
+
+	return `/${processedSegments.join("/")}`;
 }
 
 export function acceptsBody(method: string) {
