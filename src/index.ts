@@ -7,7 +7,10 @@ import { errorResponseObject } from "./error";
 async function generateOpenApi(
 	appRouter: AnyTRPCRouter,
 	opts: GenerateOpenApiDocumentOptions,
-): Promise<OpenAPIV3_1.Document> {
+): Promise<{
+	document: OpenAPIV3_1.Document;
+	mappings: Record<string, string>;
+}> {
 	const securitySchemes = opts.securitySchemes ?? {
 		Authorization: {
 			type: "http",
@@ -15,29 +18,36 @@ async function generateOpenApi(
 		},
 	};
 
-	const paths = await buildPaths(appRouter, Object.keys(securitySchemes), opts);
+	const { paths, mappings } = await buildPaths(
+		appRouter,
+		Object.keys(securitySchemes),
+		opts,
+	);
 
 	return {
-		openapi: "3.1.0",
-		info: {
-			title: opts.title,
-			description: opts.description,
-			version: opts.version,
-		},
-		servers: [
-			{
-				url: opts.baseUrl,
+		document: {
+			openapi: "3.1.0",
+			info: {
+				title: opts.title,
+				description: opts.description,
+				version: opts.version,
 			},
-		],
-		tags: opts.tags?.map((tag) => ({ name: tag })),
-		externalDocs: opts.docsUrl ? { url: opts.docsUrl } : undefined,
-		paths,
-		components: {
-			securitySchemes,
-			responses: {
-				error: errorResponseObject,
+			servers: [
+				{
+					url: opts.baseUrl,
+				},
+			],
+			tags: opts.tags?.map((tag) => ({ name: tag })),
+			externalDocs: opts.docsUrl ? { url: opts.docsUrl } : undefined,
+			paths,
+			components: {
+				securitySchemes,
+				responses: {
+					error: errorResponseObject,
+				},
 			},
 		},
+		mappings,
 	};
 }
 

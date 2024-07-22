@@ -11,6 +11,7 @@ export async function buildPaths(
 	opts: GenerateOpenApiDocumentOptions,
 ) {
 	const pathsObject: OpenAPIV3_1.PathsObject = {};
+	const mappings: Record<string, string> = {};
 
 	const procedures = appRouter._def.procedures as Record<
 		string,
@@ -36,6 +37,8 @@ export async function buildPaths(
 		if (pathsObject[path]?.[httpMethod]) {
 			throw new Error(`Duplicate path: ${path}`);
 		}
+
+		mappings[path] = _path;
 
 		const schemas = extractProcedureSchemas(procedure, procedureName);
 
@@ -71,5 +74,5 @@ export async function buildPaths(
 		};
 	}
 
-	return pathsObject;
+	return { paths: pathsObject, mappings };
 }

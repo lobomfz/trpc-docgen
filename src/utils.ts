@@ -16,19 +16,21 @@ export function normalizePath(
 		.toLowerCase()
 		.split("/");
 
-	const processedSegments = routeSegments.map((segment) => {
-		const parts = segment.split("-");
+	const processedSegments = routeSegments
+		.map((segment) => {
+			const parts = segment.split("-");
 
-		const processedParts: string[] = [];
+			const processedParts: string[] = [];
 
-		for (const part of parts) {
-			if (!wordsToRemove.includes(part)) {
-				processedParts.push(part);
+			for (const part of parts) {
+				if (!wordsToRemove.includes(part)) {
+					processedParts.push(part);
+				}
 			}
-		}
 
-		return processedParts.join("-");
-	});
+			return processedParts.join("-");
+		})
+		.filter(Boolean);
 
 	return `/${processedSegments.join("/")}`;
 }
