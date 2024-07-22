@@ -39,5 +39,15 @@ export type GenerateOpenApiDocumentOptions = {
 	tags?: string[];
 	securitySchemes?: OpenAPIV3_1.ComponentsObject["securitySchemes"];
 	blacklistedOnly?: boolean;
+	/**
+	 * Words to remove from the procedure path
+	 * @default ["get", "create", "info"]
+	 */
 	wordsToRemove?: string[];
+	/**
+	 * Generates a bruno collection from the OpenAPI schema in the target directory
+	 */
+	bruno?: {
+		outputDir: string;
+	};
 };

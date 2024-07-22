@@ -1,23 +1,51 @@
 {
-  "name": "trpc-openapi-typeschema",
-  "module": "src/index.ts",
-  "type": "module",
-  "devDependencies": {
-    "@biomejs/biome": "1.8.3",
-    "@types/bun": "latest",
-    "@types/json-schema": "^7.0.15",
-    "openapi-schema-validator": "^12.1.3",
-    "openapi-types": "^12.1.3",
-    "typescript": "^5.5.3",
-    "@trpc/server": "11.0.0-rc.467"
-  },
-  "dependencies": {
-    "@typeschema/main": "^0.13.10"
-  },
-  "optionalDependencies": {
-    "@typeschema/zod": "^0.13.3",
-    "zod": "^3.23.8",
-    "@typeschema/typebox": "^0.13.4",
-    "@sinclair/typebox": "^0.32.34"
-  }
+	"name": "@lobomfz/trpc-docgen",
+	"version": "1.1.0",
+	"description": "Generates OpenAPI schemas and a bruno collection from tRPC routers",
+	"author": {
+		"name": "lobomfz",
+		"url": "https://github.com/lobomfz",
+		"email": "lobomfz@protonmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lobomfz/trpc-docgen"
+	},
+	"main": "./dist/index.js",
+	"exports": {
+		"bun": "./dist/index.js",
+		"node": "./dist/cjs/index.js",
+		"import": "./dist/index.js",
+		"default": "./dist/index.js"
+	},
+	"types": "./src/index.ts",
+	"bugs": "https://github.com/lobomfz/elysia-trpc/issues",
+	"homepage": "https://github.com/lobomfz/elysia-trpc",
+	"keywords": [
+		"trpc",
+		"openapi",
+		"bruno",
+		"elysia"
+	],
+	"license": "MIT",
+	"scripts": {
+		"build": "tsc",
+		"release": "npm run prettier && npm run build && npm run test && npm publish --access public",
+		"prettier": "bun x prettier . --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.8.3",
+		"@types/bun": "latest",
+		"@types/json-schema": "^7.0.15",
+		"openapi-schema-validator": "^12.1.3",
+		"openapi-types": "^12.1.3",
+		"typescript": "^5.5.3",
+		"@typeschema/zod": "^0.13.3",
+		"zod": "^3.23.8",
+		"@typeschema/typebox": "^0.13.4",
+		"@sinclair/typebox": "^0.32.34"
+	},
+	"dependencies": {
+		"@typeschema/main": "^0.13.10"
+	}
 }

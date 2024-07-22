@@ -1,9 +1,9 @@
 import type { AnyTRPCProcedure, AnyTRPCRouter } from "@trpc/server";
 import type { OpenAPIV3_1 } from "openapi-types";
-import type { GenerateOpenApiDocumentOptions, OpenApiMeta } from "./types/meta";
-import { extractProcedureSchemas } from "./utils";
 import { parseInputSchema, parseOutputSchema } from "./parse";
 import { getProcedureDetails } from "./procedure";
+import type { GenerateOpenApiDocumentOptions, OpenApiMeta } from "./types/meta";
+import { extractProcedureSchemas } from "./utils";
 
 export async function buildPaths(
 	appRouter: AnyTRPCRouter,
@@ -11,6 +11,9 @@ export async function buildPaths(
 	opts: GenerateOpenApiDocumentOptions,
 ) {
 	const pathsObject: OpenAPIV3_1.PathsObject = {};
+	/**
+	 * OpenAPI Path -> Procedure Path
+	 */
 	const mappings: Record<string, string> = {};
 
 	const procedures = appRouter._def.procedures as Record<
