@@ -1,5 +1,5 @@
 {
-  "name": "trpc-typeschema-openapi",
+  "name": "trpc-openapi-typeschema",
   "module": "src/index.ts",
   "type": "module",
   "devDependencies": {
