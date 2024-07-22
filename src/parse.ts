@@ -3,13 +3,15 @@ import type { OpenAPIV3_1 } from "openapi-types";
 import type { OpenApiContentType, OpenApiMeta } from "./types/meta";
 
 export async function parseInputSchema(data: {
-	schema: Schema;
+	schema?: Schema;
 	example?: Record<string, any>;
 	contentTypes?: OpenApiContentType[];
 	headerParameters: NonNullable<OpenApiMeta["openapi"]>["headers"];
-	method: Lowercase<NonNullable<OpenApiMeta["openapi"]>["method"]>;
+	method: "get" | "post";
 }): Promise<OpenAPIV3_1.OperationObject | OpenAPIV3_1.ParameterObject[]> {
 	const { schema, example, contentTypes, headerParameters, method } = data;
+
+	if (!schema) return {};
 
 	const jsonSchema = await toJSONSchema(schema);
 	const content: OpenAPIV3_1.RequestBodyObject["content"] = {};
@@ -40,3 +42,12 @@ export async function parseInputSchema(data: {
 		],
 	};
 }
+
+// export async function parseOutputSchema(data: {}) {
+// 	return {
+// 		200: successResponseObject,
+// 		default: {
+// 			$ref: "#/components/responses/error",
+// 		},
+// 	};
+// }

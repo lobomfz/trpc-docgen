@@ -1,8 +1,14 @@
 import type { AnyTRPCProcedure } from "@trpc/server";
 import { type Schema, wrap } from "@typeschema/main";
 
+const replacer = (_match: string, p1: string, p2: string) => {
+	if (p1) return `-${p1.toLowerCase()}`;
+	if (p2) return "/";
+	return "";
+};
+
 export function normalizePath(path: string) {
-	return `/${path.replace(/^\/|\/$/g, "")}`;
+	return path.replace(/([A-Z])|(\.)(?=[^/])/g, replacer);
 }
 
 export function acceptsBody(method: string) {

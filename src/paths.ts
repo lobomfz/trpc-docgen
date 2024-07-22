@@ -4,15 +4,10 @@ import type { OpenApiMeta } from "./types/meta";
 import { extractProcedureSchemas, normalizePath } from "./utils";
 import { parseInputSchema } from "./parse";
 
-const methodMap = {
-	query: "get",
-	mutation: "post",
-	subscription: null,
-} as const;
-
 export async function buildPaths(
 	appRouter: AnyTRPCRouter,
 	securitySchemeNames: string[],
+	blacklistedOnly: boolean,
 ) {
 	const pathsObject: OpenAPIV3_1.PathsObject = {};
 
@@ -25,7 +20,7 @@ export async function buildPaths(
 		const openapi = (procedure._def?.meta as any)
 			?.openapi as OpenApiMeta["openapi"];
 
-		if (!openapi || openapi.enabled === false) continue;
+		if ((!openapi && !blacklistedOnly) || openapi?.enabled === false) continue;
 
 		const type = procedure._def.type;
 
@@ -44,7 +39,7 @@ export async function buildPaths(
 
 		const inputData = await parseInputSchema({
 			schema: schemas.input,
-			example: openapi.example?.request,
+			example: openapi?.example?.request,
 			contentTypes,
 			headerParameters,
 			method: httpMethod,
@@ -54,27 +49,19 @@ export async function buildPaths(
 			...pathsObject[path],
 			[httpMethod]: {
 				operationId: path.replace(/\./g, "-"),
-				summary: openapi.summary,
-				description: openapi.description,
-				tags: openapi.tags,
-				security: openapi.protect
+				summary: openapi?.summary,
+				description: openapi?.description,
+				tags: openapi?.tags,
+				security: openapi?.protect
 					? securitySchemeNames.map((name) => ({ [name]: [] }))
 					: undefined,
 				...inputData,
-				// ...(onBody
-				// 	? {
-				// 			requestBody: inputData,
-				// 		}
-				// 	: {
-				// 			parameters: inputData,
-				// 		}),
-				// ...obj,
 				// responses: await getResponsesObject(
 				//     outputParser,
 				//     openapi.example?.response,
 				//     openapi.responseHeaders,
 				// ),
-				...(openapi.deprecated ? { deprecated: openapi.deprecated } : {}),
+				...(openapi?.deprecated ? { deprecated: openapi.deprecated } : {}),
 			},
 		};
 	}
@@ -82,19 +69,23 @@ export async function buildPaths(
 	return pathsObject;
 }
 
+const typeMethodMap = {
+	query: "get",
+	mutation: "post",
+	subscription: null,
+} as const;
+
 function getProcedureDetails(
 	path: string,
 	procedure: AnyTRPCProcedure,
-	openapi: NonNullable<OpenApiMeta["openapi"]>,
+	openapi: OpenApiMeta["openapi"],
 ) {
-	const httpMethod = openapi.method.toLocaleLowerCase() as Lowercase<
-		typeof openapi.method
-	>;
+	const httpMethod = typeMethodMap[procedure._def.type];
 
 	if (!httpMethod)
-		throw new Error(`Unsupported http method: ${openapi.method}`);
+		throw new Error(`Unsupported procedure method: ${procedure._def.type}`);
 
-	const contentTypes = openapi.contentTypes || ["application/json"];
+	const contentTypes = openapi?.contentTypes || ["application/json"];
 
 	const procedureName = `${procedure._def.type}.${path}`;
 
@@ -102,7 +93,7 @@ function getProcedureDetails(
 		throw new Error(`No content types specified for ${procedureName}`);
 	}
 
-	const normalizedPath = normalizePath(openapi.path);
+	const normalizedPath = normalizePath(openapi?.path ?? path);
 
 	const headerParameters =
 		openapi?.headers?.map((header) => ({ ...header, in: "header" as const })) ||

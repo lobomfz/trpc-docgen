@@ -10,8 +10,7 @@ export type OpenApiContentType =
 export type OpenApiMeta<TMeta = Record<string, unknown>> = TMeta & {
 	openapi?: {
 		enabled?: boolean;
-		method: OpenApiMethod;
-		path: `/${string}`;
+		path?: `/${string}`;
 		summary?: string;
 		description?: string;
 		protect?: boolean;
@@ -41,4 +40,5 @@ export type GenerateOpenApiDocumentOptions = {
 	docsUrl?: string;
 	tags?: string[];
 	securitySchemes?: OpenAPIV3_1.ComponentsObject["securitySchemes"];
+	blacklistedOnly?: boolean;
 };

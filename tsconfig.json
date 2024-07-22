@@ -22,6 +22,11 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
-  }
+    "noPropertyAccessFromIndexSignature": false,
+    "paths": {
+      // patched trpc from https://github.com/trpc/trpc/pull/5909
+      "@trpc/server": ["../../git/trpc/packages/server/src"]
+    }
+  },
+  "include": ["../../new-dogama/apps/api/src", "./src"]
 }
