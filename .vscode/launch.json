@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"configurations": [
+		{
+			"type": "bun",
+			"request": "launch",
+			"name": "Debug Bun",
+			"program": "index.ts",
+			"args": [],
+			"cwd": "${workspaceFolder}/src",
+			"env": {},
+			"strictEnv": false,
+			"watchMode": true,
+			"stopOnEntry": false,
+			"noDebug": false,
+			"runtime": "bun"
+		}
+	]
+}
