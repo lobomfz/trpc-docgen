@@ -1,6 +1,6 @@
 {
 	"name": "@lobomfz/trpc-docgen",
-	"version": "1.2.5",
+	"version": "1.2.6",
 	"description": "Generates OpenAPI schemas and a bruno collection from tRPC routers",
 	"author": {
 		"name": "lobomfz",
@@ -21,12 +21,7 @@
 	"types": "./src/index.ts",
 	"bugs": "https://github.com/lobomfz/trpc-docgen/issues",
 	"homepage": "https://github.com/lobomfz/trpc-docgen",
-	"keywords": [
-		"trpc",
-		"openapi",
-		"bruno",
-		"elysia"
-	],
+	"keywords": ["trpc", "openapi", "bruno", "elysia"],
 	"license": "MIT",
 	"scripts": {
 		"build": "tsc",

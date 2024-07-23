@@ -7,8 +7,8 @@
 			"ScriptHost"
 		] /* Specify a set of bundled library declaration files that describe the target runtime environment. */,
 		"module": "ES2022" /* Specify what module code is generated. */,
-		"moduleResolution": "node" /* Specify how TypeScript looks up a file from a given module specifier. */,
-		"baseUrl": "./src" /* Specify the base directory to resolve non-relative module names. */,
+		"moduleResolution": "Node" /* Specify how TypeScript looks up a file from a given module specifier. */,
+		"baseUrl": "." /* Specify the base directory to resolve non-relative module names. */,
 		"types": [
 			"bun-types"
 		] /* Specify type package names to be included without being referenced in a source file. */,
