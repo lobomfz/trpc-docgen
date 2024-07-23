@@ -50,4 +50,7 @@ export type GenerateOpenApiDocumentOptions = {
 	bruno?: {
 		outputDir: string;
 	};
+	openAi?: {
+		cacheFilePath: `${string}.json`;
+	};
 };

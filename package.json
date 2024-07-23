@@ -1,6 +1,6 @@
 {
 	"name": "@lobomfz/trpc-docgen",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Generates OpenAPI schemas and a bruno collection from tRPC routers",
 	"author": {
 		"name": "lobomfz",
@@ -47,5 +47,8 @@
 	},
 	"dependencies": {
 		"@typeschema/main": "^0.13.10"
+	},
+	"optionalDependencies": {
+		"openai": "^4.53.0"
 	}
 }

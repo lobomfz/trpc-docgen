@@ -1,8 +1,8 @@
 import type { AnyTRPCRouter } from "@trpc/server";
+import { createBrunoCollection } from "./bruno";
 import { errorResponseObject } from "./error";
 import { buildPaths } from "./paths";
 import type { GenerateOpenApiDocumentOptions, OpenApiMeta } from "./types/meta";
-import { createBrunoCollection } from "./bruno";
 /**
  * Converts a TRPC router to an OpenAPI schema infered from the procedure schemas.
  *

@@ -51,12 +51,14 @@ export async function buildPaths(
 			contentTypes,
 			headerParameters,
 			method: httpMethod,
+			openAiCacheFilePath: opts.openAi?.cacheFilePath,
 		});
 
 		const responses = await parseOutputSchema({
 			schema: schemas.output,
 			example: openapi?.resEx,
 			headers: openapi?.responseHeaders,
+			openAiCacheFilePath: opts.openAi?.cacheFilePath,
 		});
 
 		pathsObject[path] = {

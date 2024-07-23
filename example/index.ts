@@ -1,7 +1,7 @@
-import { initTRPC } from "@trpc/server";
-import type { OpenApiMeta } from "../src/types/meta";
-import { generateTrpcDocs } from "../src";
 import { Type } from "@sinclair/typebox";
+import { initTRPC } from "@trpc/server";
+import { generateTrpcDocs } from "../src";
+import type { OpenApiMeta } from "../src/types/meta";
 
 // this meta is also optional, but highly recommended
 const t = initTRPC.meta<OpenApiMeta>().create();
