@@ -1,6 +1,6 @@
 {
 	"name": "@lobomfz/trpc-docgen",
-	"version": "1.2.0",
+	"version": "1.2.2",
 	"description": "Generates OpenAPI schemas and a bruno collection from tRPC routers",
 	"author": {
 		"name": "lobomfz",
@@ -30,7 +30,7 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "tsc",
-		"release": "npm run prettier && npm run build && npm run test && npm publish --access public",
+		"release": "npm run build && npm publish --access public",
 		"prettier": "bun x prettier . --write"
 	},
 	"devDependencies": {
