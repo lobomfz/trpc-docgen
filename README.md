@@ -118,7 +118,11 @@ const { document, mappings } = await generateTrpcDocs(appRouter, {
 	bruno: {
 		outputDir: "./example/bruno",
 	},
-	blacklistedOnly: true,
+	blacklistedOnly: true,,
+	// cache file for key value examples
+	openAi: {
+		cacheFilePath: "./examples.json",
+	},
 });
 
 Bun.write("./example/openapi.json", JSON.stringify(document, null, 2));
@@ -128,6 +132,7 @@ Bun.write("./example/openapi.json", JSON.stringify(document, null, 2));
 
 ## TODO:
 
+- bruno diffing to detect external changes
 - use ts-morph to extract types to remove schema dependency
 - better superjson support in the new router 
 - Add more configs
