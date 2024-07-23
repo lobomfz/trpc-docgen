@@ -1,4 +1,5 @@
 import type { JSONSchema7 } from "json-schema";
+//@ts-ignore
 import OpenAI from "openai";
 
 export const openai = new OpenAI();
