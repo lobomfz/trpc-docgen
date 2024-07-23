@@ -58,7 +58,7 @@ async function createBrunoCollection(
 				},
 				method: method.toUpperCase(),
 				url: `${baseUrl}${routePath}`,
-				auth: "none",
+				auth: "inherit",
 			};
 
 			if (details.requestBody) {
