@@ -19,8 +19,8 @@
 		"default": "./dist/index.js"
 	},
 	"types": "./src/index.ts",
-	"bugs": "https://github.com/lobomfz/elysia-trpc/issues",
-	"homepage": "https://github.com/lobomfz/elysia-trpc",
+	"bugs": "https://github.com/lobomfz/trpc-docgen/issues",
+	"homepage": "https://github.com/lobomfz/trpc-docgen",
 	"keywords": [
 		"trpc",
 		"openapi",
