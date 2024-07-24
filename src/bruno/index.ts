@@ -68,7 +68,7 @@ async function createBrunoCollection(
 				auth: "inherit",
 				...(parsedExistingFile.http ?? {}),
 				method,
-				url: `${baseUrl}${routePath}`,
+				url: parsedExistingFile.http?.url ?? `${baseUrl}${routePath}`,
 				body: method === "get" ? "none" : "json",
 			};
 
