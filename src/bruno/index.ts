@@ -69,7 +69,7 @@ async function createBrunoCollection(
 				...(parsedExistingFile.http ?? {}),
 				method,
 				url: `${baseUrl}${routePath}`,
-				body: "json",
+				body: method === "get" ? "none" : "json",
 			};
 
 			if (details.requestBody) {
