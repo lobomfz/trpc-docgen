@@ -1,17 +1,10 @@
-import * as path from "node:path";
 import type { OpenAPIV3_1 } from "openapi-types";
-import type { BrunoFile } from "../types/bruno";
-import {
-	createCollection,
-	generateBrunoFileContent,
-	generateSampleBody,
-} from "./utils";
+import { brunoParser } from "./utils";
+import path from "node:path";
+import bruToJson from "@usebruno/lang/v2/src/bruToJson";
+import jsonToBru from "@usebruno/lang/v2/src/jsonToBru";
 
-// TODOS:
-// - delete unused routes if setting is enabled
-// - setting to not overwrite body
-
-// this is terrible and should be rewritten
+// still needs a lot of work
 async function createBrunoCollection(
 	openApiSchema: OpenAPIV3_1.Document,
 	outputDir: string,
@@ -22,11 +15,10 @@ async function createBrunoCollection(
 
 	const baseUrl = openApiSchema.servers?.[0]?.url || "http://localhost";
 
-	await createCollection(openApiSchema.info.title, outputDir);
+	await brunoParser.createBase(openApiSchema, outputDir);
 
 	for (const [routePath, methods] of Object.entries(openApiSchema.paths)) {
 		const folderName = routePath.split("/")[1];
-
 		const folderPath = path.join(outputDir, folderName);
 
 		if (!methods) {
@@ -46,42 +38,65 @@ async function createBrunoCollection(
 				.replace(folderPath, "")
 				.replace(`/${folderName}/`, "");
 
-			const fileName = `${name}.bru`;
+			const filePath = path.join(folderPath, `${name}.bru`);
 
-			const smallName = name.split("/").at(-1) ?? name;
+			const titleName = (name.split("/").at(-1) ?? name)
+				.replaceAll("-", " ")
+				.replace("/", "");
 
-			const brunoFile: BrunoFile = {
-				meta: {
-					name: smallName.replaceAll("-", " ").replace("/", ""),
+			const existingFile = await Bun.file(filePath)
+				.text()
+				.catch(() => "");
+
+			const parsedExistingFile = bruToJson(existingFile);
+
+			if (parsedExistingFile.meta) {
+				parsedExistingFile.meta = {
+					...parsedExistingFile.meta,
+					name: titleName,
+					type: "http",
+				};
+			} else {
+				parsedExistingFile.meta = {
+					name: titleName,
 					type: "http",
 					seq: 1,
-				},
-				method: method.toUpperCase(),
-				url: `${baseUrl}${routePath}`,
+				};
+			}
+
+			parsedExistingFile.http = {
 				auth: "inherit",
+				...(parsedExistingFile.http ?? {}),
+				method,
+				url: `${baseUrl}${routePath}`,
+				body: "json",
 			};
 
 			if (details.requestBody) {
-				brunoFile.body = "json";
-
 				if ("content" in details.requestBody) {
 					const data = details.requestBody.content["application/json"];
 
 					const { schema, example } = data;
 
-					const sampleBody = example ?? generateSampleBody(schema);
+					const sampleBody = example ?? brunoParser.generateSampleBody(schema);
 
-					brunoFile.bodyJson = JSON.stringify(sampleBody, null, 2);
+					if (!parsedExistingFile.body) {
+						parsedExistingFile.body = {};
+					}
+
+					const existingJson = JSON.parse(parsedExistingFile.body.json ?? "{}");
+
+					const newJson = {
+						...sampleBody,
+						...existingJson,
+					};
+
+					parsedExistingFile.body.json = JSON.stringify(newJson, null, 2);
 				}
 			}
 
-			const brunoContent = generateBrunoFileContent(brunoFile);
-
-			const filePath = path.join(folderPath, fileName);
-
-			await Bun.write(filePath, brunoContent);
+			await Bun.write(filePath, jsonToBru(parsedExistingFile));
 		}
 	}
 }
-
 export { createBrunoCollection };

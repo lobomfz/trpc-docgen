@@ -1,71 +1,73 @@
-import type { BrunoFile } from "../types/bruno";
+import type { OpenAPIV3_1 } from "openapi-types";
+import collectionParser from "@usebruno/lang/v2/src/collectionBruToJson";
+import jsonToBruCollection from "@usebruno/lang/v2/src/jsonToCollectionBru";
 
-export async function createCollection(title: string, dir: string) {
-	const brunoJson = {
-		version: "1",
-		name: title,
-		type: "collection",
-		ignore: ["node_modules", ".git"],
-	};
-
-	await Bun.write(`${dir}/bruno.json`, JSON.stringify(brunoJson, null, 2));
-}
-
-export function generateSampleBody(schema: any) {
-	if (schema.type === "object") {
-		const result: Record<string, any> = {};
-
-		if (schema.properties) {
-			for (const [prop, propSchema] of Object.entries(schema.properties)) {
-				result[prop] = generateSampleBody(propSchema);
-			}
+export const brunoParser = {
+	parseAuth(collection: CollectionBruJsonResult, schema: OpenAPIV3_1.Document) {
+		if (!collection.auth) {
+			collection.auth = {
+				mode: "none",
+			};
 		}
 
-		return result;
-	}
+		return collection.auth;
+	},
 
-	switch (schema.type) {
-		case "string":
-			return "";
-		case "number":
-			return 0;
-		case "integer":
-			return 0;
-		case "boolean":
-			return false;
-		case "array":
-			return [];
-	}
+	async createBase(schema: OpenAPIV3_1.Document, dir: string) {
+		const brunoJson = {
+			version: 1,
+			name: schema.info.title,
+			type: "collection",
+			ignore: ["node_modules", ".git"],
+		};
 
-	return new Date().toISOString();
-}
+		await Bun.write(`${dir}/bruno.json`, JSON.stringify(brunoJson, null, 2));
 
-export function generateBrunoFileContent(brunoFile: BrunoFile): string {
-	let content = `meta {
-  name: ${brunoFile.meta.name}
-  type: ${brunoFile.meta.type}
-  seq: ${brunoFile.meta.seq}
-}
+		const collectionFile = await Bun.file(`${dir}/collection.bru`)
+			.text()
+			.catch(() => "");
 
-${brunoFile.method.toLowerCase()} {
-  url: ${brunoFile.url}
-  body: ${brunoFile.body || "none"}
-  auth: ${brunoFile.auth}
-}
-`;
+		const parsedCollection = collectionParser(collectionFile);
 
-	if (brunoFile.bodyJson) {
-		const indentedBodyJson = brunoFile.bodyJson
-			.split("\n")
-			.map((line) => "  " + line)
-			.join("\n");
+		const newCollection = structuredClone(parsedCollection);
 
-		content += `
-body:json {
-${indentedBodyJson}
-}
-  `;
-	}
+		const auth = brunoParser.parseAuth(newCollection, schema);
 
-	return content;
-}
+		await Bun.write(
+			`${dir}/collection.bru`,
+			jsonToBruCollection({
+				...newCollection,
+				auth,
+			}),
+		);
+	},
+
+	generateSampleBody(schema: any) {
+		if (schema.type === "object") {
+			const result: Record<string, any> = {};
+
+			if (schema.properties) {
+				for (const [prop, propSchema] of Object.entries(schema.properties)) {
+					result[prop] = this.generateSampleBody(propSchema);
+				}
+			}
+
+			return result;
+		}
+
+		switch (schema.type) {
+			case "string":
+				return "";
+			case "number":
+				return 0;
+			case "integer":
+				return 0;
+			case "boolean":
+				return false;
+			case "array":
+				return [];
+		}
+
+		return new Date().toISOString();
+	},
+};

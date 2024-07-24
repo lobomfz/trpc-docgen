@@ -41,7 +41,8 @@
 		"@sinclair/typebox": "^0.32.34"
 	},
 	"dependencies": {
-		"@typeschema/main": "^0.13.10"
+		"@typeschema/main": "^0.13.10",
+		"@usebruno/lang": "^0.15.0"
 	},
 	"optionalDependencies": {
 		"openai": "^4.53.0"
