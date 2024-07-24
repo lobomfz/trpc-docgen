@@ -95,6 +95,33 @@ async function createBrunoCollection(
 				}
 			}
 
+			if (details.parameters) {
+				const parsedExistingParams = Object.fromEntries(
+					(parsedExistingFile.params ?? []).map((param) => [
+						param.name,
+						param.value,
+					]),
+				);
+
+				const newParams = Object.fromEntries(
+					// @ts-expect-error
+					Object.keys(details.parameters?.[0]?.schema?.properties).map(
+						(key) => [key, ""],
+					),
+				);
+
+				parsedExistingFile.params = Object.entries({
+					...newParams,
+					...parsedExistingParams,
+				}).map(([name, value]) => ({
+					name,
+					value,
+					type: "query",
+					// enables everything for now
+					enabled: true,
+				}));
+			}
+
 			await Bun.write(filePath, jsonToBru(parsedExistingFile));
 		}
 	}
