@@ -1,13 +1,21 @@
 import type { JSONSchema7 } from "json-schema";
 import OpenAI from "openai";
 
-export const openai = new OpenAI();
+let openai: OpenAI | undefined = undefined;
+
+try {
+	openai = new OpenAI();
+} catch {}
 
 export async function getExamplesFromSchema(
 	schema: JSONSchema7,
 	cacheFilePath?: string,
 ) {
 	if (!schema?.properties) return {};
+
+	if (!openai) {
+		throw new Error("missing OPENAI_API_KEY env ");
+	}
 
 	const example: Record<string, any> = {};
 
