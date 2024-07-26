@@ -96,30 +96,33 @@ async function createBrunoCollection(
 			}
 
 			if (details.parameters) {
-				const parsedExistingParams = Object.fromEntries(
-					(parsedExistingFile.params ?? []).map((param) => [
-						param.name,
-						param.value,
-					]),
-				);
-
-				const newParams = Object.fromEntries(
+				const newParamsKeys = Object.keys(
 					// @ts-expect-error
-					Object.keys(details.parameters?.[0]?.schema?.properties).map(
-						(key) => [key, ""],
-					),
+					details.parameters?.[0]?.schema?.properties,
 				);
 
-				parsedExistingFile.params = Object.entries({
-					...newParams,
-					...parsedExistingParams,
-				}).map(([name, value]) => ({
-					name,
-					value,
-					type: "query",
-					// enables everything for now
-					enabled: true,
-				}));
+				const allParamsNames = new Set(newParamsKeys);
+
+				if (parsedExistingFile.params?.length) {
+					for (const param of parsedExistingFile.params) {
+						allParamsNames.add(param.name);
+					}
+				}
+
+				const parsed = Array.from(allParamsNames).map((name) => {
+					const existing = parsedExistingFile.params?.find(
+						(param) => param.name === name,
+					);
+
+					return {
+						name,
+						value: existing?.value ?? "",
+						type: "query" as const,
+						enabled: existing?.enabled ?? true,
+					};
+				});
+
+				parsedExistingFile.params = parsed;
 			}
 
 			await Bun.write(filePath, jsonToBru(parsedExistingFile));
